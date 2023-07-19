@@ -108,11 +108,11 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   // const turbineMaster = gltf.scene.getObjectByName("turbine_master").children[0];
   const turbineBladeMaster = gltf.scene.getObjectByName("turbine_blades");
   turbineBladeMaster.material = bakedTurbineBlade;
-  // turbineBladeMaster.visible = false;
+  turbineBladeMaster.visible = false;
 
   const turbineBaseMaster = gltf.scene.getObjectByName("turbine_base");
   turbineBaseMaster.material = bakedTurbineBase;
-  // turbineBaseMaster.visible = false;
+  turbineBaseMaster.visible = false;
 
   /**
    * Cloners
@@ -124,7 +124,7 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   coniferEls.children.forEach((child) => (child.visible = false));
 
   turbineEls = gltf.scene.getObjectByName("turbines_land").children[0];
-  // turbineEls.children.forEach((child) => (child.visible = false));
+  turbineEls.children.forEach((child) => (child.visible = false));
 
   console.log(coniferEls);
 
@@ -166,10 +166,8 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   });
 
   turbineEls.children.forEach((mesh, i) => {
-    let mat = new THREE.MeshBasicMaterial({ color: 0xff0099 });
-    mesh.material = mat;
     let dummy = new THREE.Object3D();
-    // mesh.translateY(0.2);
+    // mesh.translateY(-0.1);
     dummy.position.copy(mesh.position);
     dummy.rotation.copy(mesh.rotation);
     dummy.scale.copy(mesh.scale);
