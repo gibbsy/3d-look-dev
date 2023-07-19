@@ -81,6 +81,7 @@ let landMesh,
   coniferInstanced,
   turbineBaseInstanced,
   turbineBladeInstanced;
+let dummy = new THREE.Object3D();
 
 gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   console.log(gltf.scene);
@@ -148,7 +149,6 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   // hydrogenInstanced.instanceMatrix.needsUpdate = true;
 
   hydrogenEls.children.forEach((mesh, i) => {
-    let dummy = new THREE.Object3D();
     dummy.position.copy(mesh.position);
     dummy.rotation.copy(mesh.rotation);
     dummy.scale.copy(mesh.scale);
@@ -157,7 +157,6 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   });
 
   coniferEls.children.forEach((mesh, i) => {
-    let dummy = new THREE.Object3D();
     dummy.position.copy(mesh.position);
     dummy.rotation.copy(mesh.rotation);
     dummy.scale.copy(mesh.scale);
@@ -166,7 +165,6 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   });
 
   turbineEls.children.forEach((mesh, i) => {
-    let dummy = new THREE.Object3D();
     // mesh.translateY(-0.1);
     dummy.position.copy(mesh.position);
     dummy.rotation.copy(mesh.rotation);
@@ -255,7 +253,6 @@ const tick = () => {
   // Update stats
   stats.update();
 
-  let dummy = new THREE.Object3D();
   let mat4 = new THREE.Matrix4();
   for (let i = 0; i < 40; i++) {
     turbineBladeInstanced.getMatrixAt(i, mat4);
