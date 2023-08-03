@@ -44,14 +44,43 @@ gltfLoader.setDRACOLoader(dracoLoader);
  * Textures
  */
 
-const landTex = textureLoader.load("tex/land_beauty.jpg");
-const oceanTex = textureLoader.load("tex/ocean_beauty.jpg");
+const landTex = textureLoader.load("tex/land_tex.jpg");
+const oceanTex = textureLoader.load("tex/ocean_tex.jpg");
 const hydrogenTex = textureLoader.load("tex/hydrogen_tex.jpg");
-const coniferTex = textureLoader.load("tex/conifer_tex.png");
+const coniferTex = textureLoader.load("tex/conifer_tex.jpg");
+const palmTreeTex = textureLoader.load("tex/palmtree_tex.jpg");
 const turbineBladeTex = textureLoader.load("tex/turbine_blade_tex.jpg");
 const turbineBaseTex = textureLoader.load("tex/turbine_base_tex.jpg");
+const tankerTex = textureLoader.load("tex/tanker_tex.jpg");
+const containerShipTex = textureLoader.load("tex/container_ship_tex.jpg");
+const lpgTex = textureLoader.load("tex/lpg_tex.jpg");
+// const trawlerTex = textureLoader.load("tex/trawler_tex.jpg");
+const portLrgTex = textureLoader.load("tex/port_lrg_tex.jpg");
+const portSimpleTex = textureLoader.load("tex/port_simple_tex.jpg");
+const cruiseShipTex = textureLoader.load("tex/cruise_ship_tex.jpg");
+const satelliteTex = textureLoader.load("tex/satellite_tex.jpg");
+const solarTex = textureLoader.load("tex/solar_panel_tex.jpg");
+const bulkTex = textureLoader.load("tex/bulk_tex.jpg");
 
-const textures = [landTex, oceanTex, hydrogenTex, coniferTex, turbineBladeTex, turbineBaseTex];
+const textures = [
+  landTex,
+  oceanTex,
+  hydrogenTex,
+  coniferTex,
+  turbineBladeTex,
+  turbineBaseTex,
+  tankerTex,
+  containerShipTex,
+  lpgTex,
+  // trawlerTex,
+  portLrgTex,
+  portSimpleTex,
+  cruiseShipTex,
+  satelliteTex,
+  solarTex,
+  bulkTex,
+  palmTreeTex,
+];
 textures.forEach((texture) => {
   texture.flipY = false;
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -65,8 +94,13 @@ const bakedLand = new THREE.MeshBasicMaterial({ map: landTex });
 const bakedOcean = new THREE.MeshBasicMaterial({ map: oceanTex });
 const bakedHydrogen = new THREE.MeshBasicMaterial({ map: hydrogenTex });
 const bakedConifer = new THREE.MeshBasicMaterial({ map: coniferTex });
+const bakedPalmTree = new THREE.MeshBasicMaterial({ map: palmTreeTex });
 const bakedTurbineBlade = new THREE.MeshBasicMaterial({ map: turbineBladeTex });
 const bakedTurbineBase = new THREE.MeshBasicMaterial({ map: turbineBaseTex });
+const bakedContainerShip = new THREE.MeshBasicMaterial({ map: containerShipTex });
+const bakedPortLrg = new THREE.MeshBasicMaterial({ map: portLrgTex });
+const bakedPortSimple = new THREE.MeshBasicMaterial({ map: portSimpleTex });
+const bakedSolar = new THREE.MeshBasicMaterial({ map: solarTex });
 
 /**
  * Model
@@ -75,15 +109,38 @@ const bakedTurbineBase = new THREE.MeshBasicMaterial({ map: turbineBaseTex });
 let landMesh,
   oceanMesh,
   hydrogenEls,
-  coniferEls,
-  turbineEls,
+  hydrogenTurbineEls,
   hydrogenInstanced,
+  coniferEls,
   coniferInstanced,
+  palmTreeEls,
+  palmTreeInstanced,
+  turbineEls,
   turbineBaseInstanced,
-  turbineBladeInstanced;
+  turbineBladeInstanced,
+  solarEls,
+  solarInstanced,
+  shipEls,
+  containerShipEls,
+  containerShipInstanced,
+  trawlerEls,
+  trawlerInstanced,
+  bulkEls,
+  bulkInstanced,
+  cruiseEls,
+  cruiseInstanced,
+  lpgEls,
+  lpgInstanced,
+  tankerEls,
+  tankerInstanced,
+  portLrgEls,
+  portLrgInstanced,
+  portSimpleEls,
+  portSimpleInstanced;
+
 let dummy = new THREE.Object3D();
 
-gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
+gltfLoader.load("globe_geo.glb", (gltf) => {
   console.log(gltf.scene);
 
   /**
@@ -98,7 +155,7 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   /**
    * Master objects
    */
-  const hydrogenMaster = gltf.scene.getObjectByName("hydrogen_mesh_master");
+  const hydrogenMaster = gltf.scene.getObjectByName("hydrogen_plant_base_geo");
   hydrogenMaster.visible = false;
   hydrogenMaster.material = bakedHydrogen;
 
@@ -106,65 +163,110 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
   coniferMaster.visible = false;
   coniferMaster.material = bakedConifer;
 
+  const palmTreeMaster = gltf.scene.getObjectByName("palmtree_master");
+  palmTreeMaster.visible = false;
+  palmTreeMaster.material = bakedPalmTree;
+
   // const turbineMaster = gltf.scene.getObjectByName("turbine_master").children[0];
-  const turbineBladeMaster = gltf.scene.getObjectByName("turbine_blades");
+  const turbineBladeMaster = gltf.scene.getObjectByName("turbine_blades_master");
   turbineBladeMaster.material = bakedTurbineBlade;
   turbineBladeMaster.visible = false;
 
-  const turbineBaseMaster = gltf.scene.getObjectByName("turbine_base");
+  const turbineBaseMaster = gltf.scene.getObjectByName("turbine_base_master");
   turbineBaseMaster.material = bakedTurbineBase;
   turbineBaseMaster.visible = false;
+
+  const solarMaster = gltf.scene.getObjectByName("solar_panel_master");
+  solarMaster.material = bakedSolar;
+  solarMaster.visible = false;
+
+  const containerShipMaster = gltf.scene.getObjectByName("container_ship_master");
+  containerShipMaster.material = bakedContainerShip;
+  containerShipMaster.visible = false;
+
+  const portLrgMaster = gltf.scene.getObjectByName("Port_large_master");
+  portLrgMaster.material = bakedPortLrg;
+  portLrgMaster.visible = false;
+
+  const portSimpleMaster = gltf.scene.getObjectByName("Port_simple_master");
+  portSimpleMaster.material = bakedPortSimple;
+  portSimpleMaster.visible = false;
 
   /**
    * Cloners
    */
-  hydrogenEls = gltf.scene.getObjectByName("hydrogen_storage").children[0];
-  hydrogenEls.children.forEach((child) => (child.visible = false));
+  hydrogenEls = gltf.scene.getObjectByName("hydrogen_plants").children;
+  hydrogenEls.forEach((child) => (child.visible = false));
 
-  coniferEls = gltf.scene.getObjectByName("conifer_trees").children[0];
-  coniferEls.children.forEach((child) => (child.visible = false));
+  solarEls = gltf.scene.getObjectByName("solar_panels").children;
+  solarEls.forEach((child) => (child.visible = false));
 
-  turbineEls = gltf.scene.getObjectByName("turbines_land").children[0];
-  turbineEls.children.forEach((child) => (child.visible = false));
+  coniferEls = gltf.scene.getObjectByName("conifer_trees").children;
+  coniferEls.forEach((child) => (child.visible = false));
 
-  console.log(coniferEls);
+  palmTreeEls = gltf.scene.getObjectByName("palm_trees").children;
+  palmTreeEls.forEach((child) => (child.visible = false));
+
+  turbineEls = gltf.scene.getObjectByName("turbines_onshore").children;
+  turbineEls.push(...gltf.scene.getObjectByName("turbines_offshore").children);
+  turbineEls.forEach((child) => (child.visible = false));
+
+  shipEls = gltf.scene.getObjectByName("Ships").children;
+  shipEls.forEach((child) => (child.visible = false));
+
+  containerShipEls = shipEls.filter((el) => el.name.includes("container"));
+
+  portLrgEls = gltf.scene.getObjectByName("ports_large").children;
+  portLrgEls.forEach((child) => (child.visible = false));
+
+  portSimpleEls = gltf.scene.getObjectByName("ports_simple").children;
+  portSimpleEls.forEach((child) => (child.visible = false));
 
   const hydrogenGeometry = hydrogenMaster.geometry.clone();
+  const solarGeometry = solarMaster.geometry.clone();
   const coniferGeometry = coniferMaster.geometry.clone();
+  const palmTreeGeometry = palmTreeMaster.geometry.clone();
   const turbineBladeGeometry = turbineBladeMaster.geometry.clone();
   const turbineBaseGeometry = turbineBaseMaster.geometry.clone();
+  const containerShipGeometry = containerShipMaster.geometry.clone();
+  const portLrgGeometry = portLrgMaster.geometry.clone();
+  const portSimpleGeometry = portSimpleMaster.geometry.clone();
 
   const defaultTransform = new THREE.Matrix4();
 
   hydrogenGeometry.applyMatrix4(defaultTransform);
+  solarGeometry.applyMatrix4(defaultTransform);
   coniferGeometry.applyMatrix4(defaultTransform);
+  palmTreeGeometry.applyMatrix4(defaultTransform);
   turbineBladeGeometry.applyMatrix4(defaultTransform);
   turbineBaseGeometry.applyMatrix4(defaultTransform);
+  containerShipGeometry.applyMatrix4(defaultTransform);
+  portLrgGeometry.applyMatrix4(defaultTransform);
+  portSimpleGeometry.applyMatrix4(defaultTransform);
 
-  hydrogenInstanced = new THREE.InstancedMesh(hydrogenGeometry, bakedHydrogen, hydrogenEls.children.length);
-  coniferInstanced = new THREE.InstancedMesh(coniferGeometry, bakedConifer, coniferEls.children.length);
-  turbineBaseInstanced = new THREE.InstancedMesh(turbineBaseGeometry, bakedTurbineBase, turbineEls.children.length);
-  turbineBladeInstanced = new THREE.InstancedMesh(turbineBladeGeometry, bakedTurbineBlade, turbineEls.children.length);
+  /**
+   * Instancing
+   */
 
-  // hydrogenInstanced.instanceMatrix.needsUpdate = true;
+  hydrogenInstanced = new THREE.InstancedMesh(hydrogenGeometry, bakedHydrogen, hydrogenEls.length);
+  solarInstanced = new THREE.InstancedMesh(solarGeometry, bakedSolar, solarEls.length);
+  coniferInstanced = new THREE.InstancedMesh(coniferGeometry, bakedConifer, coniferEls.length);
+  palmTreeInstanced = new THREE.InstancedMesh(palmTreeGeometry, bakedPalmTree, palmTreeEls.length);
+  turbineBaseInstanced = new THREE.InstancedMesh(
+    turbineBaseGeometry,
+    bakedTurbineBase,
+    turbineEls.length + hydrogenEls.length * 2
+  );
+  turbineBladeInstanced = new THREE.InstancedMesh(
+    turbineBladeGeometry,
+    bakedTurbineBlade,
+    turbineEls.length + hydrogenEls.length * 2
+  );
+  containerShipInstanced = new THREE.InstancedMesh(containerShipGeometry, bakedContainerShip, containerShipEls.length);
+  portLrgInstanced = new THREE.InstancedMesh(portLrgGeometry, bakedPortLrg, portLrgEls.length);
+  portSimpleInstanced = new THREE.InstancedMesh(portSimpleGeometry, bakedPortSimple, portSimpleEls.length);
 
-  hydrogenEls.children.forEach((mesh, i) => {
-    dummy.position.copy(mesh.position);
-    dummy.rotation.copy(mesh.rotation);
-    dummy.scale.copy(mesh.scale);
-    dummy.updateMatrix();
-    hydrogenInstanced.setMatrixAt(i, dummy.matrix);
-  });
-
-  coniferEls.children.forEach((mesh, i) => {
-    dummy.position.copy(mesh.position);
-    dummy.rotation.copy(mesh.rotation);
-    dummy.scale.copy(mesh.scale);
-    dummy.updateMatrix();
-    coniferInstanced.setMatrixAt(i, dummy.matrix);
-  });
-
-  turbineEls.children.forEach((mesh, i) => {
+  turbineEls.forEach((mesh, i) => {
     // mesh.translateY(-0.1);
     dummy.position.copy(mesh.position);
     dummy.rotation.copy(mesh.rotation);
@@ -172,15 +274,104 @@ gltfLoader.load("globe_objects_bake_test_geo.glb", (gltf) => {
     dummy.updateMatrix();
     turbineBaseInstanced.setMatrixAt(i, dummy.matrix);
     // position the blades relative to base and ranomize starting rotation
-    dummy.translateY(0.45);
-    dummy.translateZ(0.04);
+    dummy.translateY(0.375);
+    dummy.translateZ(0.03);
     dummy.rotateZ(Math.random() * 90);
     dummy.updateMatrix();
     turbineBladeInstanced.setMatrixAt(i, dummy.matrix);
   });
 
+  hydrogenTurbineEls = [];
+  hydrogenEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    hydrogenInstanced.setMatrixAt(i, dummy.matrix);
+    // x2 turbines per hydrogen plant
+    hydrogenTurbineEls.push([mesh, mesh]);
+  });
+
+  solarEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    solarInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  hydrogenTurbineEls.forEach((arr, i) => {
+    arr.forEach((mesh, j) => {
+      dummy.position.copy(mesh.position);
+      dummy.rotation.copy(mesh.rotation);
+      dummy.scale.copy(mesh.scale);
+      dummy.updateMatrix();
+      dummy.scale.set(0.25, 0.25, 0.25);
+      dummy.translateZ(-0.25);
+      dummy.translateY(0.05);
+      dummy.translateX(-0.05 - 0.175 * j);
+      dummy.rotateY(-90);
+      dummy.updateMatrix();
+      turbineBaseInstanced.setMatrixAt(i + j + turbineEls.length, dummy.matrix);
+      dummy.translateY(0.19);
+      dummy.translateZ(0.015);
+      dummy.updateMatrix();
+      turbineBladeInstanced.setMatrixAt(i + j + turbineEls.length, dummy.matrix);
+    });
+  });
+
+  coniferEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    coniferInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  palmTreeEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    palmTreeInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  containerShipEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    containerShipInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  portLrgEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    portLrgInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  portSimpleEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    portSimpleInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
   scene.add(gltf.scene);
-  scene.add(hydrogenInstanced, coniferInstanced, turbineBaseInstanced, turbineBladeInstanced);
+  scene.add(
+    hydrogenInstanced,
+    solarInstanced,
+    coniferInstanced,
+    palmTreeInstanced,
+    turbineBaseInstanced,
+    turbineBladeInstanced,
+    containerShipInstanced,
+    portLrgInstanced,
+    portSimpleInstanced
+  );
   tick();
 });
 
@@ -226,7 +417,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMapping = THREE.NoToneMapping;
 
 gui.add(renderer, "toneMapping", {
   No: THREE.NoToneMapping,
@@ -254,7 +445,7 @@ const tick = () => {
   stats.update();
 
   let mat4 = new THREE.Matrix4();
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < turbineEls.length + hydrogenEls.length * 2; i++) {
     turbineBladeInstanced.getMatrixAt(i, mat4);
     mat4.decompose(dummy.position, dummy.quaternion, dummy.scale);
 
