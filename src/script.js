@@ -35,6 +35,8 @@ const lutMap = {
   "Clayton_33.CUBE": null,
   "Cubicle_99.CUBE": null,
   "Remy_24.CUBE": null,
+  "globe_test_01.CUBE": null,
+  "globe_test_01.3DL": null,
   // "Presetpro-Cinematic.3dl": null,
 };
 
