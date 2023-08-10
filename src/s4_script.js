@@ -24,8 +24,8 @@ spector.displayUI();
 // Debug
 const params = {
   enabled: true,
-  lut: "Bourbon 64.CUBE",
-  intensity: 1,
+  lut: "Cubicle_99.CUBE",
+  intensity: 0.75,
   use2DLut: false,
 };
 
@@ -81,7 +81,9 @@ gltfLoader.setDRACOLoader(dracoLoader);
  */
 
 const landTex = textureLoader.load("tex/land_tex.jpg");
+const landTexNight = textureLoader.load("tex/land_tex_s4.jpg");
 const oceanTex = textureLoader.load("tex/ocean_tex.jpg");
+const oceanTexNight = textureLoader.load("tex/ocean_tex_s4.jpg");
 const hydrogenTex = textureLoader.load("tex/hydrogen_tex.jpg");
 const coniferTex = textureLoader.load("tex/conifer_tex.jpg");
 const palmTreeTex = textureLoader.load("tex/palmtree_tex.jpg");
@@ -100,7 +102,9 @@ const bulkTex = textureLoader.load("tex/bulk_tex.jpg");
 
 const textures = [
   landTex,
+  landTexNight,
   oceanTex,
+  oceanTexNight,
   hydrogenTex,
   coniferTex,
   turbineBladeTex,
@@ -127,7 +131,9 @@ textures.forEach((texture) => {
  */
 // Baked material
 const bakedLand = new THREE.MeshBasicMaterial({ map: landTex });
+const bakedLandNight = new THREE.MeshBasicMaterial({ map: landTexNight });
 const bakedOcean = new THREE.MeshBasicMaterial({ map: oceanTex });
+const bakedOceanNight = new THREE.MeshBasicMaterial({ map: oceanTexNight });
 const bakedHydrogen = new THREE.MeshBasicMaterial({ map: hydrogenTex });
 const bakedConifer = new THREE.MeshBasicMaterial({ map: coniferTex });
 const bakedPalmTree = new THREE.MeshBasicMaterial({ map: palmTreeTex });
@@ -183,8 +189,8 @@ gltfLoader.load("globe_geo.glb", (gltf) => {
   landMesh = gltf.scene.getObjectByName("globe_land");
   oceanMesh = gltf.scene.getObjectByName("globe_ocean");
 
-  landMesh.material = bakedLand;
-  oceanMesh.material = bakedOcean;
+  landMesh.material = bakedLandNight;
+  oceanMesh.material = bakedOceanNight;
 
   scene.add(gltf.scene);
 
@@ -392,7 +398,7 @@ composer.addPass(lutPass);
 
 gui.add(params, "enabled");
 gui.add(params, "lut", Object.keys(lutMap));
-gui.add(params, "intensity").min(0).max(1);
+gui.add(params, "intensity").min(0).max(10);
 
 if (renderer.capabilities.isWebGL2) {
   gui.add(params, "use2DLut");
