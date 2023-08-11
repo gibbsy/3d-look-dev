@@ -457,10 +457,10 @@ const tick = () => {
 
   // lutPass.enabled = params.enabled && Boolean(lutMap[params.lut]);
   lutPass.intensity = 0.75;
-  if (lutMap[params.lut]) {
+  /*   if (lutMap[params.lut]) {
     const lut = lutMap[params.lut];
     lutPass.lut = lut.texture3D;
-  }
+  } */
   if (params.scenario == 1) {
     bakedLand.map = landTexS1;
     bakedOcean.map = oceanTexS1;
