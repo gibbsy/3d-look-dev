@@ -24,21 +24,31 @@ spector.displayUI();
 // Debug
 const params = {
   enabled: true,
-  lut: "Bourbon 64.CUBE",
-  intensity: 1,
+  lut: "Cubicle_99.CUBE",
+  intensity: 0.75,
   use2DLut: false,
+  scenario: 1,
 };
 
 const lutMap = {
-  "Bourbon_64.CUBE": null,
-  "Chemical_168.CUBE": null,
-  "Clayton_33.CUBE": null,
-  "Cubicle_99.CUBE": null,
-  "Remy_24.CUBE": null,
-  "globe_test_01.3DL": null,
-  "globe_test_01.CUBE": null,
+  // "Bourbon_64.CUBE": null,
+  // "Chemical_168.CUBE": null,
+  // "Clayton_33.CUBE": null,
+  // "Cubicle_99.CUBE": null,
+  // "Remy_24.CUBE": null,
+  // "globe_test_01.3DL": null,
+  // "globe_test_01.CUBE": null,
   "s1_lut.3DL": null,
+  "s3_lut.3DL": null,
+  "s4_lut.3DL": null,
   // "Presetpro-Cinematic.3dl": null,
+};
+
+const scenarios = {
+  1: null,
+  2: null,
+  3: null,
+  4: null,
 };
 
 Object.keys(lutMap).forEach((name) => {
@@ -80,8 +90,14 @@ gltfLoader.setDRACOLoader(dracoLoader);
  * Textures
  */
 
-const landTex = textureLoader.load("tex/land_tex.jpg");
-const oceanTex = textureLoader.load("tex/ocean_tex.jpg");
+const landTexS1 = textureLoader.load("tex/land_tex_s1.jpg");
+const landTexS2 = textureLoader.load("tex/land_tex_s2.jpg");
+const landTexS3 = textureLoader.load("tex/land_tex_s3.jpg");
+const landTexS4 = textureLoader.load("tex/land_tex_s4.jpg");
+const oceanTexS1 = textureLoader.load("tex/ocean_tex_s1.jpg");
+const oceanTexS2 = textureLoader.load("tex/ocean_tex_s2.jpg");
+const oceanTexS3 = textureLoader.load("tex/ocean_tex_s3.jpg");
+const oceanTexS4 = textureLoader.load("tex/ocean_tex_s4.jpg");
 const hydrogenTex = textureLoader.load("tex/hydrogen_tex.jpg");
 const coniferTex = textureLoader.load("tex/conifer_tex.jpg");
 const palmTreeTex = textureLoader.load("tex/palmtree_tex.jpg");
@@ -99,8 +115,14 @@ const solarTex = textureLoader.load("tex/solar_panel_tex.jpg");
 const bulkTex = textureLoader.load("tex/bulk_tex.jpg");
 
 const textures = [
-  landTex,
-  oceanTex,
+  landTexS1,
+  landTexS2,
+  landTexS3,
+  landTexS4,
+  oceanTexS1,
+  oceanTexS2,
+  oceanTexS3,
+  oceanTexS4,
   hydrogenTex,
   coniferTex,
   turbineBladeTex,
@@ -126,8 +148,8 @@ textures.forEach((texture) => {
  * Materials
  */
 // Baked material
-const bakedLand = new THREE.MeshBasicMaterial({ map: landTex });
-const bakedOcean = new THREE.MeshBasicMaterial({ map: oceanTex });
+const bakedLand = new THREE.MeshBasicMaterial();
+const bakedOcean = new THREE.MeshBasicMaterial();
 const bakedHydrogen = new THREE.MeshBasicMaterial({ map: hydrogenTex });
 const bakedConifer = new THREE.MeshBasicMaterial({ map: coniferTex });
 const bakedPalmTree = new THREE.MeshBasicMaterial({ map: palmTreeTex });
@@ -390,16 +412,17 @@ composer.addPass(new OutputPass());
 const lutPass = new LUTPass();
 composer.addPass(lutPass);
 
-gui.add(params, "enabled");
-gui.add(params, "lut", Object.keys(lutMap));
-gui.add(params, "intensity").min(0).max(1);
+// gui.add(params, "enabled");
+// gui.add(params, "lut", Object.keys(lutMap));
+// gui.add(params, "intensity").min(0).max(10);
+gui.add(params, "scenario", Object.keys(scenarios));
 
-if (renderer.capabilities.isWebGL2) {
+/* if (renderer.capabilities.isWebGL2) {
   gui.add(params, "use2DLut");
 } else {
   params.use2DLut = true;
 }
-
+ */
 /**
  * Animate
  */
@@ -430,12 +453,39 @@ const tick = () => {
   }
 
   satelliteInstanced.rotation.x += 0.001;
+  // scamera.rotation.z += 0.01;
 
-  lutPass.enabled = params.enabled && Boolean(lutMap[params.lut]);
-  lutPass.intensity = params.intensity;
+  // lutPass.enabled = params.enabled && Boolean(lutMap[params.lut]);
+  lutPass.intensity = 0.75;
   if (lutMap[params.lut]) {
     const lut = lutMap[params.lut];
-    lutPass.lut = params.use2DLut ? lut.texture : lut.texture3D;
+    lutPass.lut = lut.texture3D;
+  }
+  if (params.scenario == 1) {
+    bakedLand.map = landTexS1;
+    bakedOcean.map = oceanTexS1;
+    const lut = lutMap["s1_lut.3DL"];
+    lutPass.lut = lut.texture3D;
+    lutPass.enabled = true;
+  }
+  if (params.scenario == 2) {
+    bakedLand.map = landTexS2;
+    bakedOcean.map = oceanTexS2;
+    lutPass.enabled = false;
+  }
+  if (params.scenario == 3) {
+    bakedLand.map = landTexS3;
+    bakedOcean.map = oceanTexS3;
+    const lut = lutMap["s3_lut.3DL"];
+    lutPass.lut = lut.texture3D;
+    lutPass.enabled = true;
+  }
+  if (params.scenario == 4) {
+    bakedLand.map = landTexS4;
+    bakedOcean.map = oceanTexS4;
+    const lut = lutMap["s4_lut.3DL"];
+    lutPass.lut = lut.texture3D;
+    lutPass.enabled = true;
   }
 
   // Render

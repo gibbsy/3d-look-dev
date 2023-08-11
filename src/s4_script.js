@@ -27,6 +27,7 @@ const params = {
   lut: "Cubicle_99.CUBE",
   intensity: 0.75,
   use2DLut: false,
+  scenario: "s1",
 };
 
 const lutMap = {
@@ -38,7 +39,15 @@ const lutMap = {
   "globe_test_01.3DL": null,
   "globe_test_01.CUBE": null,
   "s1_lut.3DL": null,
+  "s4_lut.3DL": null,
   // "Presetpro-Cinematic.3dl": null,
+};
+
+const scenarios = {
+  "Scenario 1": "s1",
+  "Scenario 2": "s2",
+  "Scenario 3": "s3",
+  "Scenario 4": "s4",
 };
 
 Object.keys(lutMap).forEach((name) => {
@@ -399,6 +408,7 @@ composer.addPass(lutPass);
 gui.add(params, "enabled");
 gui.add(params, "lut", Object.keys(lutMap));
 gui.add(params, "intensity").min(0).max(10);
+gui.add(params, "scenario", Object.keys(scenarios));
 
 if (renderer.capabilities.isWebGL2) {
   gui.add(params, "use2DLut");
