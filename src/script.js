@@ -466,7 +466,7 @@ const tick = () => {
     bakedOcean.map = oceanTexS1;
     const lut = lutMap["s1_lut.3DL"];
     lutPass.lut = lut.texture3D;
-    lutPass.enabled = true;
+    // lutPass.enabled = true;
   }
   if (params.scenario == 2) {
     bakedLand.map = landTexS2;
