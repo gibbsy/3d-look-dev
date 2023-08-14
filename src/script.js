@@ -90,14 +90,14 @@ gltfLoader.setDRACOLoader(dracoLoader);
  * Textures
  */
 
-const landTexS1 = textureLoader.load("tex/land_tex_s1.jpg");
-const landTexS2 = textureLoader.load("tex/land_tex_s2.jpg");
-const landTexS3 = textureLoader.load("tex/land_tex_s3.jpg");
-const landTexS4 = textureLoader.load("tex/land_tex_s4.jpg");
-const oceanTexS1 = textureLoader.load("tex/ocean_tex_s1.jpg");
-const oceanTexS2 = textureLoader.load("tex/ocean_tex_s2.jpg");
-const oceanTexS3 = textureLoader.load("tex/ocean_tex_s3.jpg");
-const oceanTexS4 = textureLoader.load("tex/ocean_tex_s4.jpg");
+const landTexS1 = textureLoader.load("tex/land_tex_energy-transition.jpg");
+const landTexS2 = textureLoader.load("tex/land_tex_tech-driven-transition.jpg");
+const landTexS3 = textureLoader.load("tex/land_tex_regionalised-transition.jpg");
+const landTexS4 = textureLoader.load("tex/land_tex_delayed-transition.jpg");
+const oceanTexS1 = textureLoader.load("tex/ocean_tex_energy-transition.jpg");
+const oceanTexS2 = textureLoader.load("tex/ocean_tex_tech-driven-transition.jpg");
+const oceanTexS3 = textureLoader.load("tex/ocean_tex_regionalised-transition.jpg");
+const oceanTexS4 = textureLoader.load("tex/ocean_tex_delayed-transition.jpg");
 const hydrogenTex = textureLoader.load("tex/hydrogen_tex.jpg");
 const coniferTex = textureLoader.load("tex/conifer_tex.jpg");
 const palmTreeTex = textureLoader.load("tex/palmtree_tex.jpg");
