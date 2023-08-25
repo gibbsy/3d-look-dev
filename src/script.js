@@ -113,6 +113,18 @@ const cruiseShipTex = textureLoader.load("tex/cruise_ship_tex.jpg");
 const satelliteTex = textureLoader.load("tex/satellite_tex.jpg");
 const solarTex = textureLoader.load("tex/solar_panel_tex.jpg");
 const bulkTex = textureLoader.load("tex/bulk_tex.jpg");
+const droneTex = textureLoader.load("tex/drone_tex.jpg");
+const whaleTex = textureLoader.load("tex/whale_tex.jpg");
+const dorsalTex = textureLoader.load("tex/dorsal_tex.jpg");
+const craneTex = textureLoader.load("tex/crane_tex.jpg");
+const fish_farm_tex = textureLoader.load("tex/fish_farm_tex.jpg");
+const gullTex = textureLoader.load("tex/gull_tex.jpg");
+const highRiseText = textureLoader.load("tex/high_rise_tex.jpg");
+const houseTex = textureLoader.load("tex/house_tex.jpg");
+const lowRiseTex = textureLoader.load("tex/low_rise_tex.jpg");
+const shipyardTex = textureLoader.load("tex/shipyard_tex.jpg");
+const skyscraperTex = textureLoader.load("tex/skyscraper_tex.jpg");
+const wifiTex = textureLoader.load("tex/wifi_tex.jpg");
 
 const textures = [
   landTexS1,
@@ -138,6 +150,18 @@ const textures = [
   solarTex,
   bulkTex,
   palmTreeTex,
+  droneTex,
+  whaleTex,
+  dorsalTex,
+  craneTex,
+  fish_farm_tex,
+  gullTex,
+  highRiseText,
+  houseTex,
+  lowRiseTex,
+  shipyardTex,
+  skyscraperTex,
+  wifiTex,
 ];
 textures.forEach((texture) => {
   texture.flipY = false;
@@ -165,6 +189,18 @@ const bakedPortLrg = new THREE.MeshBasicMaterial({ map: portLrgTex });
 const bakedPortSimple = new THREE.MeshBasicMaterial({ map: portSimpleTex });
 const bakedSolar = new THREE.MeshBasicMaterial({ map: solarTex });
 const bakedSatellite = new THREE.MeshBasicMaterial({ map: satelliteTex });
+const bakedDrone = new THREE.MeshBasicMaterial({ map: droneTex });
+const bakedWhale = new THREE.MeshBasicMaterial({ map: whaleTex });
+const bakedDorsal = new THREE.MeshBasicMaterial({ map: dorsalTex });
+const bakedCrane = new THREE.MeshBasicMaterial({ map: craneTex });
+const bakedFishFarm = new THREE.MeshBasicMaterial({ map: fish_farm_tex });
+const bakedGull = new THREE.MeshBasicMaterial({ map: gullTex });
+const bakedHighRise = new THREE.MeshBasicMaterial({ map: highRiseText });
+const bakedHouse = new THREE.MeshBasicMaterial({ map: houseTex });
+const bakedLowRise = new THREE.MeshBasicMaterial({ map: lowRiseTex });
+const bakedShipyard = new THREE.MeshBasicMaterial({ map: shipyardTex });
+const bakedSkyscraper = new THREE.MeshBasicMaterial({ map: skyscraperTex });
+const bakedWifi = new THREE.MeshBasicMaterial({ map: wifiTex });
 
 /**
  * Model
@@ -191,11 +227,27 @@ let gltfScene,
   tankerInstanced,
   portLrgInstanced,
   portSimpleInstanced,
-  satelliteInstanced;
+  satelliteInstanced,
+  droneEls,
+  droneBladeEls,
+  droneInstanced,
+  whaleInstanced,
+  dorsalInstanced,
+  fishInstanced,
+  fishFarmInstanced,
+  gullInstanced,
+  highRiseInstanced,
+  houseInstanced,
+  lowRiseInstanced,
+  shipyardInstanced,
+  shipyardEls,
+  skyscraperInstanced,
+  wifiInstanced,
+  wifiEls;
 
 const dummy = new THREE.Object3D();
 
-gltfLoader.load("globe_geo.glb", (gltf) => {
+gltfLoader.load("Globe_Geo.glb", (gltf) => {
   console.log(gltf.scene);
   gltfScene = gltf.scene;
 
@@ -256,6 +308,14 @@ function initObjects() {
   portLrgInstanced = createInstance("port_large_master", "ports_large", bakedPortLrg);
   portSimpleInstanced = createInstance("port_simple_master", "ports_simple", bakedPortSimple);
   satelliteInstanced = createInstance("satellite_master", "satellites", bakedSatellite);
+  houseInstanced = createInstance("house_master", "houses", bakedHouse);
+  highRiseInstanced = createInstance("high_rise_master", "high_rises", bakedHighRise);
+  lowRiseInstanced = createInstance("low_rise_master", "low_rises", bakedLowRise);
+  skyscraperInstanced = createInstance("skyscraper_master", "skyscrapers", bakedSkyscraper);
+  whaleInstanced = createInstance("whale_master", "whales", bakedWhale);
+  dorsalInstanced = createInstance("dorsal_fin_master", "sharks", bakedDorsal);
+  fishInstanced = createInstance("whale_master", "fishes", bakedWhale);
+  fishFarmInstanced = createInstance("fish_farm_master", "fish_farm", bakedFishFarm);
 
   /**
    * Ships
@@ -273,6 +333,7 @@ function initObjects() {
    */
 
   const hydrogenMaster = createMasterObj("hydrogen_plant_base_geo", bakedHydrogen);
+  const droneMaster = createMasterObj("drone_body_master", bakedDrone);
   const turbineBladeMaster = createMasterObj("turbine_blades_master", bakedTurbineBlade);
   const turbineBaseMaster = createMasterObj("turbine_base_master", bakedTurbineBase);
 
@@ -282,6 +343,9 @@ function initObjects() {
   hydrogenEls = gltfScene.getObjectByName("hydrogen_plants").children;
   hydrogenEls.forEach((child) => (child.visible = false));
 
+  droneEls = gltfScene.getObjectByName("drones").children;
+  droneEls.forEach((child) => (child.visible = false));
+
   turbineEls = gltfScene.getObjectByName("turbines_onshore").children;
   turbineEls.push(...gltfScene.getObjectByName("turbines_offshore").children);
   turbineEls.forEach((child) => (child.visible = false));
@@ -289,6 +353,7 @@ function initObjects() {
   const hydrogenGeometry = hydrogenMaster.geometry.clone();
   const turbineBladeGeometry = turbineBladeMaster.geometry.clone();
   const turbineBaseGeometry = turbineBaseMaster.geometry.clone();
+  const droneGeometry = droneMaster.geometry.clone();
 
   /**
    * Instancing
@@ -297,8 +362,13 @@ function initObjects() {
   const numTurbines = turbineEls.length + hydrogenEls.length * 2;
 
   hydrogenInstanced = new THREE.InstancedMesh(hydrogenGeometry, bakedHydrogen, hydrogenEls.length);
+  droneInstanced = new THREE.InstancedMesh(droneGeometry, bakedDrone, droneEls.length);
   turbineBaseInstanced = new THREE.InstancedMesh(turbineBaseGeometry, bakedTurbineBase, numTurbines);
-  turbineBladeInstanced = new THREE.InstancedMesh(turbineBladeGeometry, bakedTurbineBlade, numTurbines);
+  turbineBladeInstanced = new THREE.InstancedMesh(
+    turbineBladeGeometry,
+    bakedTurbineBlade,
+    numTurbines + droneEls.length * 4
+  );
 
   turbineEls.forEach((mesh, i) => {
     // mesh.translateY(-0.1);
@@ -344,7 +414,47 @@ function initObjects() {
     turbineBladeInstanced.setMatrixAt(i + turbineEls.length, dummy.matrix);
   });
 
-  scene.add(hydrogenInstanced, turbineBaseInstanced, turbineBladeInstanced);
+  droneBladeEls = [];
+  droneEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    droneInstanced.setMatrixAt(i, dummy.matrix);
+    // x4 blades per drone
+
+    // dummy.updateMatrix();
+    for (let j = 0; j < 4; j++) {
+      dummy.position.copy(mesh.position);
+      dummy.rotation.copy(mesh.rotation);
+      dummy.scale.copy(mesh.scale);
+      dummy.updateMatrix();
+      dummy.scale.set(0.12, 0.12, 0.12);
+      if (j == 0) {
+        dummy.translateZ(-0.07);
+        dummy.translateX(-0.07);
+      } else if (j == 1) {
+        dummy.translateZ(-0.07);
+        dummy.translateX(0.07);
+      } else if (j == 2) {
+        dummy.translateZ(0.07);
+        dummy.translateX(-0.07);
+      } else {
+        dummy.translateZ(0.07);
+        dummy.translateX(0.07);
+      }
+      dummy.rotateX(90);
+      dummy.updateMatrix();
+      droneBladeEls.push(dummy.clone());
+    }
+  });
+
+  droneBladeEls.forEach((dummy, i) => {
+    console.log(i, dummy);
+    turbineBladeInstanced.setMatrixAt(i + turbineEls.length + hydrogenTurbineEls.length, dummy.matrix);
+  });
+  console.log(turbineBladeInstanced);
+  scene.add(hydrogenInstanced, turbineBaseInstanced, turbineBladeInstanced, droneInstanced);
   tick();
 }
 
@@ -441,11 +551,14 @@ const tick = () => {
   stats.update();
 
   let mat4 = new THREE.Matrix4();
-  for (let i = 0; i < turbineEls.length + hydrogenEls.length * 2; i++) {
+  for (let i = 0; i < turbineBladeInstanced.count; i++) {
     turbineBladeInstanced.getMatrixAt(i, mat4);
     mat4.decompose(dummy.position, dummy.quaternion, dummy.scale);
-
-    dummy.rotation.z += t;
+    if (i >= turbineEls.length + hydrogenTurbineEls.length) {
+      dummy.rotation.z += t * 15;
+    } else {
+      dummy.rotation.z += t;
+    }
     dummy.updateMatrix();
 
     turbineBladeInstanced.setMatrixAt(i, dummy.matrix);
