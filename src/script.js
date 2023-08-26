@@ -235,6 +235,7 @@ let gltfScene,
   dorsalInstanced,
   fishInstanced,
   fishFarmInstanced,
+  gullEls,
   gullInstanced,
   highRiseInstanced,
   houseInstanced,
@@ -336,6 +337,7 @@ function initObjects() {
   const droneMaster = createMasterObj("drone_body_master", bakedDrone);
   const turbineBladeMaster = createMasterObj("turbine_blades_master", bakedTurbineBlade);
   const turbineBaseMaster = createMasterObj("turbine_base_master", bakedTurbineBase);
+  const gullMaster = createMasterObj("gull_master", bakedGull);
 
   /**
    * Placeholders
@@ -350,10 +352,15 @@ function initObjects() {
   turbineEls.push(...gltfScene.getObjectByName("turbines_offshore").children);
   turbineEls.forEach((child) => (child.visible = false));
 
+  /**
+   * Geometries
+   */
+
   const hydrogenGeometry = hydrogenMaster.geometry.clone();
   const turbineBladeGeometry = turbineBladeMaster.geometry.clone();
   const turbineBaseGeometry = turbineBaseMaster.geometry.clone();
   const droneGeometry = droneMaster.geometry.clone();
+  const gullGeometry = gullMaster.geometry.clone();
 
   /**
    * Instancing
@@ -369,6 +376,29 @@ function initObjects() {
     bakedTurbineBlade,
     numTurbines + droneEls.length * 4
   );
+  // gullEls = shipEls.filter((el) => el.name.includes("trawler"));
+  gullEls = [];
+  for (let i = 0; i < trawlerInstanced.count; i++) {
+    let mat4 = new THREE.Matrix4();
+    trawlerInstanced.getMatrixAt(i, mat4);
+    // 3 gulls
+    gullEls.push(mat4, mat4, mat4);
+  }
+  gullInstanced = new THREE.InstancedMesh(gullGeometry, bakedGull, gullEls.length);
+  gullEls.forEach((matrix, i) => {
+    matrix.decompose(dummy.position, dummy.quaternion, dummy.scale);
+    dummy.updateMatrix();
+    dummy.translateX(Math.random() - 1);
+    dummy.translateY(Math.random() + 0.1);
+    dummy.translateZ(Math.random() - 1);
+    // dummy.translateZ(Math.random());
+    // dummy.rotateX(Math.random() * 5);
+    // dummy.rotateY(Math.random() * 360);
+    // dummy.rotateZ(Math.random() * 5);
+    dummy.updateMatrix();
+    gullInstanced.setMatrixAt(i, dummy.matrix);
+    // gullInstanced.setMatrixAt(i, dummy.matrix);
+  });
 
   turbineEls.forEach((mesh, i) => {
     // mesh.translateY(-0.1);
@@ -423,8 +453,8 @@ function initObjects() {
     droneInstanced.setMatrixAt(i, dummy.matrix);
     // x4 blades per drone
 
-    // dummy.updateMatrix();
     for (let j = 0; j < 4; j++) {
+      // reset transforms for each blade
       dummy.position.copy(mesh.position);
       dummy.rotation.copy(mesh.rotation);
       dummy.scale.copy(mesh.scale);
@@ -450,11 +480,9 @@ function initObjects() {
   });
 
   droneBladeEls.forEach((dummy, i) => {
-    console.log(i, dummy);
     turbineBladeInstanced.setMatrixAt(i + turbineEls.length + hydrogenTurbineEls.length, dummy.matrix);
   });
-  console.log(turbineBladeInstanced);
-  scene.add(hydrogenInstanced, turbineBaseInstanced, turbineBladeInstanced, droneInstanced);
+  scene.add(hydrogenInstanced, turbineBaseInstanced, turbineBladeInstanced, droneInstanced, gullInstanced);
   tick();
 }
 
@@ -555,7 +583,7 @@ const tick = () => {
     turbineBladeInstanced.getMatrixAt(i, mat4);
     mat4.decompose(dummy.position, dummy.quaternion, dummy.scale);
     if (i >= turbineEls.length + hydrogenTurbineEls.length) {
-      dummy.rotation.z += t * 15;
+      dummy.rotation.z += t * 6;
     } else {
       dummy.rotation.z += t;
     }
