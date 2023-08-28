@@ -9,6 +9,7 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { LUTPass } from "three/addons/postprocessing/LUTPass.js";
 import { LUTCubeLoader } from "three/addons/loaders/LUTCubeLoader.js";
 import { LUT3dlLoader } from "three/addons/loaders/LUT3dlLoader.js";
+import { getRandomNumber, degreesToRadians } from "./utils";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 
 // /**
@@ -206,45 +207,48 @@ const bakedWifi = new THREE.MeshBasicMaterial({ map: wifiTex });
  * Model
  */
 
-let gltfScene,
-  landMesh,
-  oceanMesh,
-  hydrogenEls,
-  hydrogenTurbineEls,
-  hydrogenInstanced,
+let bulkShipInstanced,
   coniferInstanced,
-  palmTreeInstanced,
-  turbineEls,
-  turbineBaseInstanced,
-  turbineBladeInstanced,
-  solarInstanced,
-  shipEls,
   containerShipInstanced,
-  trawlerInstanced,
+  craneEls,
+  craneInstanced,
   cruiseShipInstanced,
-  bulkShipInstanced,
-  lpgInstanced,
-  tankerInstanced,
-  portLrgInstanced,
-  portSimpleInstanced,
-  satelliteInstanced,
-  droneEls,
-  droneBladeEls,
-  droneInstanced,
-  whaleInstanced,
   dorsalInstanced,
-  fishInstanced,
+  droneBladeEls,
+  droneEls,
+  droneInstanced,
   fishFarmInstanced,
+  fishInstanced,
+  gltfScene,
   gullEls,
   gullInstanced,
   highRiseInstanced,
   houseInstanced,
+  hydrogenEls,
+  hydrogenInstanced,
+  hydrogenTurbineEls,
+  landMesh,
   lowRiseInstanced,
-  shipyardInstanced,
+  lpgInstanced,
+  oceanMesh,
+  palmTreeInstanced,
+  portLrgInstanced,
+  portSimpleInstanced,
+  satelliteInstanced,
+  shipEls,
   shipyardEls,
+  shipyardInstanced,
   skyscraperInstanced,
-  wifiInstanced,
-  wifiEls;
+  solarInstanced,
+  tankerInstanced,
+  tankerShipyardInstanced,
+  trawlerInstanced,
+  turbineBaseInstanced,
+  turbineBladeInstanced,
+  turbineEls,
+  whaleInstanced,
+  wifiEls,
+  wifiInstanced;
 
 const dummy = new THREE.Object3D();
 
@@ -334,10 +338,13 @@ function initObjects() {
    */
 
   const hydrogenMaster = createMasterObj("hydrogen_plant_base_geo", bakedHydrogen);
+  const shipyardMaster = createMasterObj("shipyard_base_geo", bakedShipyard);
+  const craneMaster = createMasterObj("overhead_crane_master", bakedCrane);
   const droneMaster = createMasterObj("drone_body_master", bakedDrone);
   const turbineBladeMaster = createMasterObj("turbine_blades_master", bakedTurbineBlade);
   const turbineBaseMaster = createMasterObj("turbine_base_master", bakedTurbineBase);
   const gullMaster = createMasterObj("gull_master", bakedGull);
+  const tankerMaster = createMasterObj("tanker_master", bakedTanker);
 
   /**
    * Placeholders
@@ -352,6 +359,8 @@ function initObjects() {
   turbineEls.push(...gltfScene.getObjectByName("turbines_offshore").children);
   turbineEls.forEach((child) => (child.visible = false));
 
+  shipyardEls = gltfScene.getObjectByName("shipyards").children;
+  shipyardEls.forEach((child) => (child.visible = false));
   /**
    * Geometries
    */
@@ -360,7 +369,10 @@ function initObjects() {
   const turbineBladeGeometry = turbineBladeMaster.geometry.clone();
   const turbineBaseGeometry = turbineBaseMaster.geometry.clone();
   const droneGeometry = droneMaster.geometry.clone();
+  const shipyardGeometry = shipyardMaster.geometry.clone();
+  const craneGeometry = craneMaster.geometry.clone();
   const gullGeometry = gullMaster.geometry.clone();
+  const tankerGeometry = tankerMaster.geometry.clone();
 
   /**
    * Instancing
@@ -376,29 +388,9 @@ function initObjects() {
     bakedTurbineBlade,
     numTurbines + droneEls.length * 4
   );
-  // gullEls = shipEls.filter((el) => el.name.includes("trawler"));
-  gullEls = [];
-  for (let i = 0; i < trawlerInstanced.count; i++) {
-    let mat4 = new THREE.Matrix4();
-    trawlerInstanced.getMatrixAt(i, mat4);
-    // 3 gulls
-    gullEls.push(mat4, mat4, mat4);
-  }
-  gullInstanced = new THREE.InstancedMesh(gullGeometry, bakedGull, gullEls.length);
-  gullEls.forEach((matrix, i) => {
-    matrix.decompose(dummy.position, dummy.quaternion, dummy.scale);
-    dummy.updateMatrix();
-    dummy.translateX(Math.random() - 1);
-    dummy.translateY(Math.random() + 0.1);
-    dummy.translateZ(Math.random() - 1);
-    // dummy.translateZ(Math.random());
-    // dummy.rotateX(Math.random() * 5);
-    // dummy.rotateY(Math.random() * 360);
-    // dummy.rotateZ(Math.random() * 5);
-    dummy.updateMatrix();
-    gullInstanced.setMatrixAt(i, dummy.matrix);
-    // gullInstanced.setMatrixAt(i, dummy.matrix);
-  });
+  shipyardInstanced = new THREE.InstancedMesh(shipyardGeometry, bakedShipyard, shipEls.length);
+  craneInstanced = new THREE.InstancedMesh(craneGeometry, bakedCrane, shipyardEls.length * 2);
+  tankerShipyardInstanced = new THREE.InstancedMesh(tankerGeometry, bakedTanker, shipyardEls.length);
 
   turbineEls.forEach((mesh, i) => {
     // mesh.translateY(-0.1);
@@ -410,7 +402,7 @@ function initObjects() {
     // position the blades relative to base and ranomize starting rotation
     dummy.translateY(0.375);
     dummy.translateZ(0.03);
-    dummy.rotateZ(Math.random() * 90);
+    dummy.rotateZ(degreesToRadians(Math.random() * 90));
     dummy.updateMatrix();
     turbineBladeInstanced.setMatrixAt(i, dummy.matrix);
   });
@@ -435,7 +427,7 @@ function initObjects() {
     dummy.translateZ(-0.25);
     dummy.translateY(0.05);
     dummy.translateX(-0.05 - 0.175 * (i % 2));
-    dummy.rotateY(-90);
+    dummy.rotateY(degreesToRadians(-90));
     dummy.updateMatrix();
     turbineBaseInstanced.setMatrixAt(i + turbineEls.length, dummy.matrix);
     dummy.translateY(0.19);
@@ -473,7 +465,7 @@ function initObjects() {
         dummy.translateZ(0.07);
         dummy.translateX(0.07);
       }
-      dummy.rotateX(90);
+      dummy.rotateX(degreesToRadians(90));
       dummy.updateMatrix();
       droneBladeEls.push(dummy.clone());
     }
@@ -482,7 +474,73 @@ function initObjects() {
   droneBladeEls.forEach((dummy, i) => {
     turbineBladeInstanced.setMatrixAt(i + turbineEls.length + hydrogenTurbineEls.length, dummy.matrix);
   });
-  scene.add(hydrogenInstanced, turbineBaseInstanced, turbineBladeInstanced, droneInstanced, gullInstanced);
+
+  craneEls = [];
+  shipyardEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    let scaler = mesh.scale.x;
+    dummy.updateMatrix();
+    craneEls.push(mesh, mesh);
+    shipyardInstanced.setMatrixAt(i, dummy.matrix);
+    dummy.rotateY(degreesToRadians(180));
+    dummy.translateY(0.3 * scaler);
+    dummy.translateX(0.2 * scaler);
+    dummy.updateMatrix();
+    tankerShipyardInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  craneEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    let scaler = mesh.scale.x;
+    dummy.updateMatrix();
+    dummy.translateY(0.375 * scaler);
+    dummy.translateX(i % 2 == 0 ? -0.375 * scaler : 0.475 * scaler);
+    dummy.rotateY(degreesToRadians(-90));
+    dummy.updateMatrix();
+    craneInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  gullEls = [];
+  for (let i = 0; i < trawlerInstanced.count; i++) {
+    let mat4 = new THREE.Matrix4();
+    trawlerInstanced.getMatrixAt(i, mat4);
+    // 3 gulls
+    gullEls.push(mat4, mat4, mat4);
+  }
+  for (let i = 0; i < fishFarmInstanced.count; i++) {
+    let mat4 = new THREE.Matrix4();
+    fishFarmInstanced.getMatrixAt(i, mat4);
+    // 4 gulls
+    gullEls.push(mat4, mat4, mat4, mat4);
+  }
+  gullInstanced = new THREE.InstancedMesh(gullGeometry, bakedGull, gullEls.length);
+  gullEls.forEach((matrix, i) => {
+    matrix.decompose(dummy.position, dummy.quaternion, dummy.scale);
+    dummy.scale.set(0.6, 0.6, 0.6);
+    dummy.updateMatrix();
+    dummy.translateX(getRandomNumber(-0.4, 0.4));
+    dummy.translateY(getRandomNumber(0.1, 0.2));
+    dummy.translateZ(getRandomNumber(-0.4, 0.4));
+    dummy.rotateY(degreesToRadians(Math.random() * 360));
+    dummy.rotateZ(degreesToRadians(getRandomNumber(-45, 45)));
+    dummy.updateMatrix();
+    gullInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  scene.add(
+    craneInstanced,
+    droneInstanced,
+    gullInstanced,
+    hydrogenInstanced,
+    shipyardInstanced,
+    tankerShipyardInstanced,
+    turbineBaseInstanced,
+    turbineBladeInstanced
+  );
   tick();
 }
 
@@ -603,6 +661,8 @@ const tick = () => {
     lutPass.lut = lut.texture3D;
   } */
   if (params.scenario == 1) {
+    oceanMesh.scale.set(1, 1, 1);
+
     bakedLand.map = landTexS1;
     bakedOcean.map = oceanTexS1;
     const lut = lutMap["s1_lut.3DL"];
@@ -610,11 +670,15 @@ const tick = () => {
     lutPass.enabled = true;
   }
   if (params.scenario == 2) {
+    oceanMesh.scale.set(1, 1, 1);
+
     bakedLand.map = landTexS2;
     bakedOcean.map = oceanTexS2;
     lutPass.enabled = false;
   }
   if (params.scenario == 3) {
+    oceanMesh.scale.set(1, 1, 1);
+
     bakedLand.map = landTexS3;
     bakedOcean.map = oceanTexS3;
     const lut = lutMap["s3_lut.3DL"];
@@ -622,6 +686,7 @@ const tick = () => {
     lutPass.enabled = true;
   }
   if (params.scenario == 4) {
+    oceanMesh.scale.set(1.02, 1.02, 1.02);
     bakedLand.map = landTexS4;
     bakedOcean.map = oceanTexS4;
     const lut = lutMap["s4_lut.3DL"];
