@@ -213,6 +213,8 @@ let bulkShipInstanced,
   craneEls,
   craneInstanced,
   cruiseShipInstanced,
+  darkFleetInstanced,
+  darkFleetEls,
   dorsalInstanced,
   droneBladeEls,
   droneEls,
@@ -345,6 +347,7 @@ function initObjects() {
   const turbineBaseMaster = createMasterObj("turbine_base_master", bakedTurbineBase);
   const gullMaster = createMasterObj("gull_master", bakedGull);
   const tankerMaster = createMasterObj("tanker_master", bakedTanker);
+  const trawlerMaster = createMasterObj("trawler_master", bakedTrawler);
 
   /**
    * Placeholders
@@ -361,6 +364,10 @@ function initObjects() {
 
   shipyardEls = gltfScene.getObjectByName("shipyards").children;
   shipyardEls.forEach((child) => (child.visible = false));
+
+  darkFleetEls = gltfScene.getObjectByName("dark_fleet").children;
+  darkFleetEls.forEach((child) => (child.visible = false));
+
   /**
    * Geometries
    */
@@ -373,6 +380,7 @@ function initObjects() {
   const craneGeometry = craneMaster.geometry.clone();
   const gullGeometry = gullMaster.geometry.clone();
   const tankerGeometry = tankerMaster.geometry.clone();
+  const trawlerGeometry = trawlerMaster.geometry.clone();
 
   /**
    * Instancing
@@ -391,6 +399,18 @@ function initObjects() {
   shipyardInstanced = new THREE.InstancedMesh(shipyardGeometry, bakedShipyard, shipEls.length);
   craneInstanced = new THREE.InstancedMesh(craneGeometry, bakedCrane, shipyardEls.length * 2);
   tankerShipyardInstanced = new THREE.InstancedMesh(tankerGeometry, bakedTanker, shipyardEls.length);
+  // s3 only
+  darkFleetInstanced = new THREE.InstancedMesh(trawlerGeometry, bakedTrawler, darkFleetEls.length);
+
+  darkFleetEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    darkFleetInstanced.setMatrixAt(i, dummy.matrix);
+  });
+
+  darkFleetInstanced.opacity = 0.5;
 
   turbineEls.forEach((mesh, i) => {
     // mesh.translateY(-0.1);
@@ -541,6 +561,7 @@ function initObjects() {
     turbineBaseInstanced,
     turbineBladeInstanced
   );
+  changeScene();
   tick();
 }
 
@@ -608,11 +629,45 @@ composer.addPass(new OutputPass());
 const lutPass = new LUTPass();
 composer.addPass(lutPass);
 
+function changeScene() {
+  if (params.scenario == 1) {
+    oceanMesh.scale.set(1, 1, 1);
+    bakedLand.map = landTexS1;
+    bakedOcean.map = oceanTexS1;
+    const lut = lutMap["s1_lut.3DL"];
+    lutPass.lut = lut.texture3D;
+    lutPass.enabled = true;
+  }
+  if (params.scenario == 2) {
+    oceanMesh.scale.set(1, 1, 1);
+
+    bakedLand.map = landTexS2;
+    bakedOcean.map = oceanTexS2;
+    lutPass.enabled = false;
+  }
+  if (params.scenario == 3) {
+    oceanMesh.scale.set(1, 1, 1);
+
+    bakedLand.map = landTexS3;
+    bakedOcean.map = oceanTexS3;
+    const lut = lutMap["s3_lut.3DL"];
+    lutPass.lut = lut.texture3D;
+    lutPass.enabled = true;
+  }
+  if (params.scenario == 4) {
+    oceanMesh.scale.set(1.02, 1.02, 1.02);
+    bakedLand.map = landTexS4;
+    bakedOcean.map = oceanTexS4;
+    const lut = lutMap["s4_lut.3DL"];
+    lutPass.lut = lut.texture3D;
+    lutPass.enabled = true;
+  }
+}
+
+gui.add(params, "scenario", Object.keys(scenarios)).onChange(changeScene);
 // gui.add(params, "enabled");
 // gui.add(params, "lut", Object.keys(lutMap));
 // gui.add(params, "intensity").min(0).max(10);
-gui.add(params, "scenario", Object.keys(scenarios));
-
 /* if (renderer.capabilities.isWebGL2) {
   gui.add(params, "use2DLut");
 } else {
@@ -660,39 +715,6 @@ const tick = () => {
     const lut = lutMap[params.lut];
     lutPass.lut = lut.texture3D;
   } */
-  if (params.scenario == 1) {
-    oceanMesh.scale.set(1, 1, 1);
-
-    bakedLand.map = landTexS1;
-    bakedOcean.map = oceanTexS1;
-    const lut = lutMap["s1_lut.3DL"];
-    lutPass.lut = lut.texture3D;
-    lutPass.enabled = true;
-  }
-  if (params.scenario == 2) {
-    oceanMesh.scale.set(1, 1, 1);
-
-    bakedLand.map = landTexS2;
-    bakedOcean.map = oceanTexS2;
-    lutPass.enabled = false;
-  }
-  if (params.scenario == 3) {
-    oceanMesh.scale.set(1, 1, 1);
-
-    bakedLand.map = landTexS3;
-    bakedOcean.map = oceanTexS3;
-    const lut = lutMap["s3_lut.3DL"];
-    lutPass.lut = lut.texture3D;
-    lutPass.enabled = true;
-  }
-  if (params.scenario == 4) {
-    oceanMesh.scale.set(1.02, 1.02, 1.02);
-    bakedLand.map = landTexS4;
-    bakedOcean.map = oceanTexS4;
-    const lut = lutMap["s4_lut.3DL"];
-    lutPass.lut = lut.texture3D;
-    lutPass.enabled = true;
-  }
 
   // Render
   composer.render();
