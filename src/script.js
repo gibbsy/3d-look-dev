@@ -655,7 +655,7 @@ function changeScene() {
     lutPass.enabled = true;
   }
   if (params.scenario == 4) {
-    oceanMesh.scale.set(1, 1, 1);
+    oceanMesh.scale.set(1.02, 1.02, 1.02);
     bakedLand.map = landTexS4;
     bakedOcean.map = oceanTexS4;
     const lut = lutMap["s4_lut.3DL"];
