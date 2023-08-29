@@ -366,6 +366,7 @@ function initObjects() {
   shipyardEls.forEach((child) => (child.visible = false));
 
   darkFleetEls = gltfScene.getObjectByName("dark_fleet").children;
+  console.log(darkFleetEls);
   darkFleetEls.forEach((child) => (child.visible = false));
 
   /**
@@ -396,7 +397,7 @@ function initObjects() {
     bakedTurbineBlade,
     numTurbines + droneEls.length * 4
   );
-  shipyardInstanced = new THREE.InstancedMesh(shipyardGeometry, bakedShipyard, shipEls.length);
+  shipyardInstanced = new THREE.InstancedMesh(shipyardGeometry, bakedShipyard, shipyardEls.length);
   craneInstanced = new THREE.InstancedMesh(craneGeometry, bakedCrane, shipyardEls.length * 2);
   tankerShipyardInstanced = new THREE.InstancedMesh(tankerGeometry, bakedTanker, shipyardEls.length);
   // s3 only
@@ -410,7 +411,7 @@ function initObjects() {
     darkFleetInstanced.setMatrixAt(i, dummy.matrix);
   });
 
-  darkFleetInstanced.opacity = 0.5;
+  // darkFleetInstanced.opacity = 0.5;
 
   turbineEls.forEach((mesh, i) => {
     // mesh.translateY(-0.1);
@@ -559,7 +560,8 @@ function initObjects() {
     shipyardInstanced,
     tankerShipyardInstanced,
     turbineBaseInstanced,
-    turbineBladeInstanced
+    turbineBladeInstanced,
+    darkFleetInstanced
   );
   changeScene();
   tick();
