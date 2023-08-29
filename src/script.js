@@ -366,7 +366,6 @@ function initObjects() {
   shipyardEls.forEach((child) => (child.visible = false));
 
   darkFleetEls = gltfScene.getObjectByName("dark_fleet").children;
-  console.log(darkFleetEls);
   darkFleetEls.forEach((child) => (child.visible = false));
 
   /**
@@ -402,16 +401,6 @@ function initObjects() {
   tankerShipyardInstanced = new THREE.InstancedMesh(tankerGeometry, bakedTanker, shipyardEls.length);
   // s3 only
   darkFleetInstanced = new THREE.InstancedMesh(trawlerGeometry, bakedTrawler, darkFleetEls.length);
-
-  darkFleetEls.forEach((mesh, i) => {
-    dummy.position.copy(mesh.position);
-    dummy.rotation.copy(mesh.rotation);
-    dummy.scale.copy(mesh.scale);
-    dummy.updateMatrix();
-    darkFleetInstanced.setMatrixAt(i, dummy.matrix);
-  });
-
-  // darkFleetInstanced.opacity = 0.5;
 
   turbineEls.forEach((mesh, i) => {
     // mesh.translateY(-0.1);
@@ -538,6 +527,18 @@ function initObjects() {
     // 4 gulls
     gullEls.push(mat4, mat4, mat4, mat4);
   }
+  // Dark fleet for S3 only - basically 4 extra trawlers
+  darkFleetEls.forEach((mesh, i) => {
+    dummy.position.copy(mesh.position);
+    dummy.rotation.copy(mesh.rotation);
+    dummy.scale.copy(mesh.scale);
+    dummy.updateMatrix();
+    darkFleetInstanced.setMatrixAt(i, dummy.matrix);
+    gullEls.push(dummy.matrix.clone());
+  });
+
+  // darkFleetInstanced.opacity = 0.5;
+
   gullInstanced = new THREE.InstancedMesh(gullGeometry, bakedGull, gullEls.length);
   gullEls.forEach((matrix, i) => {
     matrix.decompose(dummy.position, dummy.quaternion, dummy.scale);
