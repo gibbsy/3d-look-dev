@@ -18,7 +18,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(`${__dirname}/src`, "index.html"),
-        s4: resolve(`${__dirname}/src`, "scenario04.html"),
       },
     },
   },
