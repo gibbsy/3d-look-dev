@@ -536,8 +536,7 @@ function initObjects() {
     darkFleetInstanced.setMatrixAt(i, dummy.matrix);
     gullEls.push(dummy.matrix.clone());
   });
-
-  // darkFleetInstanced.opacity = 0.5;
+  bakedTrawler.transparent = true;
 
   gullInstanced = new THREE.InstancedMesh(gullGeometry, bakedGull, gullEls.length);
   gullEls.forEach((matrix, i) => {
@@ -640,6 +639,7 @@ function changeScene() {
     const lut = lutMap["s1_lut.3DL"];
     lutPass.lut = lut.texture3D;
     lutPass.enabled = true;
+    bakedTrawler.opacity = 1;
   }
   if (params.scenario == 2) {
     oceanMesh.scale.set(1, 1, 1);
@@ -647,6 +647,7 @@ function changeScene() {
     bakedLand.map = landTexS2;
     bakedOcean.map = oceanTexS2;
     lutPass.enabled = false;
+    bakedTrawler.opacity = 1;
   }
   if (params.scenario == 3) {
     oceanMesh.scale.set(1, 1, 1);
@@ -656,6 +657,7 @@ function changeScene() {
     const lut = lutMap["s3_lut.3DL"];
     lutPass.lut = lut.texture3D;
     lutPass.enabled = true;
+    bakedTrawler.opacity = 0.3;
   }
   if (params.scenario == 4) {
     oceanMesh.scale.set(1.02, 1.02, 1.02);
@@ -664,6 +666,7 @@ function changeScene() {
     const lut = lutMap["s4_lut.3DL"];
     lutPass.lut = lut.texture3D;
     lutPass.enabled = true;
+    bakedTrawler.opacity = 1;
   }
 }
 
